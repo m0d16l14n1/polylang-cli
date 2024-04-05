@@ -1,5 +1,5 @@
 {
-    "name": "diggy/polylang-cli",
+    "name": "elperi/polylang-cli",
     "description": "CLI for the Polylang plugin",
     "type": "wp-cli-package",
     "homepage": "https://github.com/diggy/polylang-cli",
