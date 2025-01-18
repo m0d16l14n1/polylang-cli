@@ -2,7 +2,7 @@
 /**
  * CLI interface for the Polylang plugin.
  *
- * @author  Peter J. Herrel <peterherrel@gmail.com>
+ * @author  Peter J.
  * @package diggy/polylang-cli
  * @version 1.0.0-prealpha.1
  */
@@ -17,20 +17,20 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
         WP_CLI::error( sprintf( 'This WP-CLI package requires WP-CLI version %s or higher. Please visit %s', '1.5.0', 'https://wp-cli.org/#updating' ) );
     }
 
-    # api, cli
+    // API, CLI
     require __DIR__ . '/src/Api/Api.php';
     require __DIR__ . '/src/Api/Cli.php';
 
-    # traits
+    // Traits
     require __DIR__ . '/src/Traits/Cpt.php';
     require __DIR__ . '/src/Traits/SettingsErrors.php';
     require __DIR__ . '/src/Traits/Properties.php';
     require __DIR__ . '/src/Traits/Utils.php';
 
-    # base command
+    // Base command
     require __DIR__ . '/src/Commands/BaseCommand.php';
 
-    # commands
+    // Commands
     require __DIR__ . '/src/Commands/Api.php';
     require __DIR__ . '/src/Commands/Doctor.php';
     require __DIR__ . '/src/Commands/Option.php';
@@ -46,29 +46,38 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
     require __DIR__ . '/src/Commands/String.php';
 
     WP_CLI::add_hook( 'before_wp_load', function() {
-
         WP_CLI::add_wp_hook( 'init', function() {
-
-            # make sure polylang_mo post type is always registered
+            // Ensure polylang_mo post type is always registered
             if ( ! post_type_exists( 'polylang_mo' ) ) {
                 $labels = array( 'name' => __( 'Strings translations', 'polylang' ) );
-                register_post_type( 'polylang_mo', array( 'labels' => $labels, 'rewrite' => false, 'query_var' => false, '_pll' => true ) );
+                register_post_type(
+                    'polylang_mo',
+                    array(
+                        'labels'     => $labels,
+                        'rewrite'    => false,
+                        'query_var'  => false,
+                        '_pll'       => true
+                    )
+                );
             }
-
         });
-
     });
 
     WP_CLI::add_hook( 'before_invoke:pll menu', function() {
-
-            # make sure localized (temporary) nav menu locations are always registered
+        // Make sure localized (temporary) nav menu locations are always registered
+        if ( defined( 'PLL_INC' ) && file_exists( PLL_INC . '/nav-menu.php' ) ) {
             require_once PLL_INC . '/nav-menu.php';
-            $pll_nav_menu = new \PLL_Nav_Menu( \PLL() );
-            $pll_nav_menu->create_nav_menu_locations();
 
+            if ( class_exists( '\\PLL_Nav_Menu' ) && function_exists( 'PLL' ) ) {
+                $pll_nav_menu = new \PLL_Nav_Menu( \PLL() );
+                $pll_nav_menu->create_nav_menu_locations();
+            }
+        } else {
+            WP_CLI::debug( 'Polylang constants are not defined or nav-menu.php not found. Skipping PLL nav menu location registration.' );
+        }
     });
 
-    // WP_CLI::add_command( 'pll',        Polylang_CLI\Cli::class );
+    // WP_CLI::add_command( 'pll', Polylang_CLI\Cli::class );
 
     WP_CLI::add_command( 'pll api',       Polylang_CLI\Commands\ApiCommand::class );
     WP_CLI::add_command( 'pll cache',     Polylang_CLI\Commands\CacheCommand::class );
