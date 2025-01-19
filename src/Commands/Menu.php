@@ -1,3 +1,5 @@
+<?php
+
 namespace Polylang_CLI\Commands;
 
 if ( ! class_exists( 'Polylang_CLI\Commands\MenuCommand' ) ) {
